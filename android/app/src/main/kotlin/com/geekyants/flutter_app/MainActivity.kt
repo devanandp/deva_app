@@ -1,4 +1,4 @@
-package com.geekyants.flutter_app
+package com.geekyants.deva_app
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

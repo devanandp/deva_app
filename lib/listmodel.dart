@@ -1,7 +1,7 @@
-class Student {
+class Listmodel {
   int id;
   String name;
-  Student(this.id, this.name);
+  Listmodel(this.id, this.name);
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
@@ -11,7 +11,7 @@ class Student {
     return map;
   }
 
-  Student.fromMap(Map<String, dynamic> map) {
+  Listmodel.fromMap(Map<String, dynamic> map) {
     id = map['id'];
     name = map['name'];
   }
