@@ -13,16 +13,18 @@ class _RainbowState extends State<Rainbow> {
     return Scaffold(
       appBar: AppBar(
         title: Center(child: Text("Rainbow App")),
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.teal,
       ),
       body: Container(
         child: ListView(
           children: <Widget>[
             Center(
               child: Container(
-                child: Image.asset('assets/images/flutter.png', width: 50, height: 50,),
-                padding: EdgeInsets.all(1),
+                child: Image.asset('assets/images/flutter.png', width: 50, height: 60,),
+                padding: EdgeInsets.all(50),
                 color: colval,
+                height: 300,
+                width: 300,
               ),
             ),
             FlatButton(
@@ -88,7 +90,6 @@ class _RainbowState extends State<Rainbow> {
                 });
               },
             )
-
           ],
         ),
       ),
