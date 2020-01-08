@@ -46,7 +46,7 @@ class MyMapSampleState extends State<MyMap> {
                   Row(
                     children: <Widget>[
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
                         child: RaisedButton(
                           color: Colors.greenAccent,
                           onPressed: () {
@@ -74,13 +74,31 @@ class MyMapSampleState extends State<MyMap> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
                         child: RaisedButton(
                           color: Colors.deepOrange,
                           onPressed: _getLocation,
                           child: Text("Back to your location!"),
                         ),
-                      )
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                        child: RaisedButton(
+                          color: Colors.blueAccent,
+                          onPressed: () {
+                            mapController.animateCamera(
+                              CameraUpdate.newCameraPosition(CameraPosition(
+                                target: LatLng(40.688841, -74.044015),
+                                zoom: 11,
+                              ),),
+                            );
+                            setState(() {
+                              _markers.clear();
+                            });
+                          },
+                          child: Text("Reset!"),
+                        ),
+                      ),
                     ],
                   ),
                   TextField(
