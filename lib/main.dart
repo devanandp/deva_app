@@ -4,9 +4,10 @@ import 'package:deva_app/rainbow.dart';
 import 'package:flutter/material.dart';
 import 'form_creation.dart';
 import 'get_location.dart';
+import 'map_creation.dart';
 void main() {
   runApp(
       MaterialApp(
-          home: Rainbow()
+          home: MyMap()
       ));
 }
