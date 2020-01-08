@@ -29,7 +29,7 @@ class _ColorAppState extends State<ColorApp> {
       if (isSwitched) {
         return Colors.amber;
       } else {
-        return Colors.lightBlue;
+        return Colors.black;
       }
     }
 
@@ -55,7 +55,7 @@ class _ColorAppState extends State<ColorApp> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: textchanger(),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.redAccent,
       ),
       body: Container(
         color: colortook,
