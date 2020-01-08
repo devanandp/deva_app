@@ -2,7 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:io' as io;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'listmodel.dart';
+import 'list_model.dart';
 
 class DBstructure{
    static Database _db;
@@ -43,6 +43,16 @@ class DBstructure{
          }
       }
       return component;
+   }
+
+   Future<int> update(Listmodel component) async {
+      var dbClient = await db;
+      return await dbClient.update(
+         'listing',
+         component.toMap(),
+         where: 'id = ?',
+         whereArgs: [component.id],
+      );
    }
 
    Future<int> delete(int id) async {

@@ -1,5 +1,5 @@
-import 'package:deva_app/dbstructure.dart';
-import 'package:deva_app/listmodel.dart';
+import 'package:deva_app/db_structure.dart';
+import 'package:deva_app/list_model.dart';
 import 'package:flutter/material.dart';
 
 class Listviewer extends StatefulWidget {
@@ -11,6 +11,8 @@ class _ListviewerState extends State<Listviewer> {
   final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
   Future<List<Listmodel>> list;
   String _itemname;
+  bool isUpdate = false;
+  int itemIdForUpdate;
   DBstructure dbHelper;
   final _itemNameController = TextEditingController();
 
@@ -32,10 +34,16 @@ class _ListviewerState extends State<Listviewer> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
-        title: Text("List View"),
+        title: Text("Cart Page"),
       ),
       body: Column(
         children: <Widget>[
+          CircleAvatar(
+            child: ClipOval(
+              child: Image.asset("assets/images/Add_to_Cart.png"),
+            ),
+            radius: 50.0,
+          ),
           Form(
             key: _formStateKey,
             autovalidate: true,
@@ -46,7 +54,7 @@ class _ListviewerState extends State<Listviewer> {
                   child: TextFormField(
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Please Enter the list item';
+                        return 'Please Enter the item to add to Cart';
                       }
                       return null;
                     },
@@ -55,7 +63,7 @@ class _ListviewerState extends State<Listviewer> {
                     },
                     controller: _itemNameController,
                     decoration: InputDecoration(
-                        hintText: "Enter the list item",
+                        hintText: "Enter the list item to add to the Cart",
                         fillColor: Colors.white,
                         labelStyle: TextStyle(
                           color: Colors.green,
@@ -71,14 +79,26 @@ class _ListviewerState extends State<Listviewer> {
               RaisedButton(
                 color: Colors.green,
                 child: Text(
-                  "ADD",
+                  isUpdate ? "UPDATE ITEM" : "ADD TO CART",
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
-                  if (_formStateKey.currentState.validate()) {
-                    _formStateKey.currentState.save();
-                    print(_itemname);
-                    dbHelper.add(Listmodel(null, _itemname));
+                  if (isUpdate) {
+                    if (_formStateKey.currentState.validate()) {
+                      _formStateKey.currentState.save();
+                      dbHelper
+                          .update(Listmodel(itemIdForUpdate, _itemname))
+                          .then((data) {
+                        setState(() {
+                          isUpdate = false;
+                        });
+                      });
+                    }
+                  } else {
+                    if (_formStateKey.currentState.validate()) {
+                      _formStateKey.currentState.save();
+                      dbHelper.add(Listmodel(null, _itemname));
+                    }
                   }
                   _itemNameController.text = '';
                   refreshItemList();
@@ -90,11 +110,15 @@ class _ListviewerState extends State<Listviewer> {
               RaisedButton(
                 color: Colors.red,
                 child: Text(
-                  "CLEAR",
+                  isUpdate ? "CANCEL UPDATE" : "CLEAR THE NAME",
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
                   _itemNameController.text = '';
+                  setState(() {
+                    isUpdate = false;
+                    itemIdForUpdate = null;
+                  });
                 },
               ),
             ],
@@ -129,10 +153,10 @@ class _ListviewerState extends State<Listviewer> {
         child: DataTable(
           columns: [
             DataColumn(
-              label: Text('LIST ITEMS'),
+              label: Text('CART ITEMS'),
             ),
             DataColumn(
-              label: Text('DELETE'),
+              label: Text('DELETE FROM CART'),
             )
           ],
           rows: list.map(
@@ -144,6 +168,13 @@ class _ListviewerState extends State<Listviewer> {
                       list.name,
                       style: TextStyle(color: Colors.blue),
                     ),
+                    onTap: () {
+                      setState(() {
+                        isUpdate = true;
+                        itemIdForUpdate = list.id;
+                      });
+                      _itemNameController.text = list.name;
+                    },
                   ),
                   DataCell(
                     IconButton(
