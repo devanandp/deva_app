@@ -1,10 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io' as io;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'list_model.dart';
 
-class DBstructure{
+class DBstructure with ChangeNotifier{
    static Database _db;
 
    Future<Database> get db async {
@@ -30,6 +31,7 @@ class DBstructure{
    Future<Listmodel> add(Listmodel component) async {
       var dbClient = await db;
       component.id = await dbClient.insert('listing', component.toMap());
+      notifyListeners();
       return component;
    }
 
@@ -42,26 +44,21 @@ class DBstructure{
             component.add(Listmodel.fromMap(maps[i]));
          }
       }
+      notifyListeners();
       return component;
+
    }
 
-   Future<int> update(Listmodel component) async {
-      var dbClient = await db;
-      return await dbClient.update(
-         'listing',
-         component.toMap(),
-         where: 'id = ?',
-         whereArgs: [component.id],
-      );
-   }
 
    Future<int> delete(int id) async {
       var dbClient = await db;
-      return await dbClient.delete(
+      var process = dbClient.delete(
          'listing',
          where: 'id = ?',
          whereArgs: [id],
       );
+      notifyListeners();
+      return await process;
    }
 
 

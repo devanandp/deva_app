@@ -1,6 +1,10 @@
 import 'package:deva_app/db_structure.dart';
 import 'package:deva_app/list_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'db_structure.dart';
+
 
 class Listviewer extends StatefulWidget {
   @override
@@ -11,8 +15,6 @@ class _ListviewerState extends State<Listviewer> {
   final GlobalKey<FormState> _formStateKey = GlobalKey<FormState>();
   Future<List<Listmodel>> list;
   String _itemname;
-  bool isUpdate = false;
-  int itemIdForUpdate;
   DBstructure dbHelper;
   final _itemNameController = TextEditingController();
 
@@ -34,16 +36,11 @@ class _ListviewerState extends State<Listviewer> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.red,
-        title: Text("Cart Page"),
+        title: Text("List Page"),
       ),
       body: Column(
         children: <Widget>[
-          CircleAvatar(
-            child: ClipOval(
-              child: Image.asset("assets/images/Add_to_Cart.png"),
-            ),
-            radius: 50.0,
-          ),
+
           Form(
             key: _formStateKey,
             autovalidate: true,
@@ -54,7 +51,7 @@ class _ListviewerState extends State<Listviewer> {
                   child: TextFormField(
                     validator: (value) {
                       if (value.isEmpty) {
-                        return 'Please Enter the item to add to Cart';
+                        return 'Please Enter the item to add to List';
                       }
                       return null;
                     },
@@ -63,7 +60,7 @@ class _ListviewerState extends State<Listviewer> {
                     },
                     controller: _itemNameController,
                     decoration: InputDecoration(
-                        hintText: "Enter the list item to add to the Cart",
+                        hintText: "Enter the list item to add to the List",
                         fillColor: Colors.white,
                         labelStyle: TextStyle(
                           color: Colors.green,
@@ -79,27 +76,15 @@ class _ListviewerState extends State<Listviewer> {
               RaisedButton(
                 color: Colors.green,
                 child: Text(
-                  isUpdate ? "UPDATE ITEM" : "ADD TO CART",
+                   "ADD TO LIST",
                   style: TextStyle(color: Colors.white),
                 ),
                 onPressed: () {
-                  if (isUpdate) {
-                    if (_formStateKey.currentState.validate()) {
-                      _formStateKey.currentState.save();
-                      dbHelper
-                          .update(Listmodel(itemIdForUpdate, _itemname))
-                          .then((data) {
-                        setState(() {
-                          isUpdate = false;
-                        });
-                      });
-                    }
-                  } else {
                     if (_formStateKey.currentState.validate()) {
                       _formStateKey.currentState.save();
                       dbHelper.add(Listmodel(null, _itemname));
                     }
-                  }
+
                   _itemNameController.text = '';
                   refreshItemList();
                 },
@@ -107,20 +92,7 @@ class _ListviewerState extends State<Listviewer> {
               Padding(
                 padding: EdgeInsets.all(10),
               ),
-              RaisedButton(
-                color: Colors.red,
-                child: Text(
-                  isUpdate ? "CANCEL UPDATE" : "CLEAR THE NAME",
-                  style: TextStyle(color: Colors.white),
-                ),
-                onPressed: () {
-                  _itemNameController.text = '';
-                  setState(() {
-                    isUpdate = false;
-                    itemIdForUpdate = null;
-                  });
-                },
-              ),
+
             ],
           ),
           const Divider(
@@ -148,48 +120,53 @@ class _ListviewerState extends State<Listviewer> {
   SingleChildScrollView generateList(List<Listmodel> list) {
     return SingleChildScrollView(
       scrollDirection: Axis.vertical,
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        child: DataTable(
-          columns: [
-            DataColumn(
-              label: Text('CART ITEMS'),
-            ),
-            DataColumn(
-              label: Text('DELETE FROM CART'),
-            )
-          ],
-          rows: list.map(
-            (list) {
-              return DataRow(
-                cells: [
-                  DataCell(
-                    Text(
-                      list.name,
-                      style: TextStyle(color: Colors.blue),
-                    ),
-                    onTap: () {
-                      setState(() {
-                        isUpdate = true;
-                        itemIdForUpdate = list.id;
-                      });
-                      _itemNameController.text = list.name;
-                    },
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => DBstructure(),
+          )
+        ],
+        child: Consumer<DBstructure>(
+          builder: (context,value,_){
+            return SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: DataTable(
+                columns: [
+                  DataColumn(
+                    label: Text('LIST ITEMS'),
                   ),
-                  DataCell(
-                    IconButton(
-                      icon: Icon(Icons.delete),
-                      color: Colors.red,
-                      onPressed: () {
-                        dbHelper.delete(list.id);
-                        refreshItemList();
-                      },
-                    ),
+                  DataColumn(
+                    label: Text('DELETE FROM LIST'),
                   )
                 ],
-              );
-            },
-          ).toList(),
+                rows: list.map(
+                      (list) {
+                    return DataRow(
+                      cells: [
+                        DataCell(
+                          Text(
+                            list.name,
+                            style: TextStyle(color: Colors.blue),
+                          ),
+                        ),
+                        DataCell(
+                          IconButton(
+                            icon: Icon(Icons.delete),
+                            color: Colors.red,
+                            onPressed: () {
+                              dbHelper.delete(list.id);
+                              refreshItemList();
+                            },
+                          ),
+                        )
+                      ],
+                    );
+                  },
+                ).toList(),
+              ),
+            );
+          },
+
         ),
       ),
     );
